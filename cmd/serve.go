@@ -1,12 +1,13 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
+	"net/http"
 
+	"github.com/potterhe/alertmanager-receiver/internal/webhook"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +23,17 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("serve called")
+
+		receiverAddr := ":9393"
+
+		handler := &webhook.ReceiverHandler{}
+		mux := http.NewServeMux()
+		mux.Handle("/v1/receiver", handler)
+		srv := &http.Server{
+			Addr:    receiverAddr,
+			Handler: mux,
+		}
+		srv.ListenAndServe()
 	},
 }
 
