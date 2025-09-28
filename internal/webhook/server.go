@@ -21,6 +21,7 @@ func (rh *ReceiverHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	slog.Info("Received alert:", "body", string(alertBytes))
 
 	msg := &am_webhook.Message{}
 	if err := json.Unmarshal(alertBytes, msg); err != nil {
@@ -31,5 +32,16 @@ func (rh *ReceiverHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 
 	// TODO Handle the webhook message.
 	slog.Info("Handling alert:", "body", msg)
+	if err := rh.processNotifyMessage(msg); err != nil {
+		slog.Error("Failed to process webhook message:", "err", err)
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	rw.WriteHeader(http.StatusOK)
+}
+
+func (rh *ReceiverHandler) processNotifyMessage(msg *am_webhook.Message) error {
+	// TODO:
+	return nil
 }
